@@ -10,7 +10,6 @@
 <div class="min-h-screen flex flex-col bg-[#0a0908] text-white" style="background-color: {$customBackground};">
 	<!-- Navigation -->
 	<NavBar />
-
 	<!-- Main content -->
 	<main class="flex-grow w-full max-w-5xl mx-auto">
 		<slot />
@@ -18,7 +17,7 @@
 
 	<!-- Footer -->
 	<footer class="py-8 text-center text-base w-full max-w-5xl mx-auto">
-		Created by <a href="/about" class="text-[#ff3e00] no-underline">Nathan Rogers</a> ❤️ with
+		Created by <a href="/about" class="text-[#ff3e00] no-underline">Nathan Rogers</a>  with
 		<span class="text-[#ff3e00]">Svelte</span>
 	</footer>
 </div>
