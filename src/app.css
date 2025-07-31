@@ -1,0 +1,59 @@
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'Fira Code';
+    font-display: swap;
+    src: url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+  }
+
+  html, body {
+    font-family: 'Fira Code', monospace;
+    height: 100%;
+    color: white;
+    background-color: #0a0908;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: white;
+  }
+
+  p {
+    color: #d0d0d0;
+  }
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
+
+  ::selection {
+    color: white;
+    background: #ca3c25;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #fafffd;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+    border-radius: 1px;
+  }
+  
+  /* Force logo size */
+  img[src="/logo.svg"] {
+    width: 30px !important;
+    height: 30px !important;
+    max-width: 30px !important;
+    max-height: 30px !important;
+  }
+}
