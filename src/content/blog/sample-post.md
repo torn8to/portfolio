@@ -1,17 +1,9 @@
 ---
-title: Teaching a quadruped to walk using rl
+title: Teaching a quadruped to walk using reinforcement learning
 description: This post is a walkthrough making and teaching a robot to walk 
 tags: markdown, demo, svelte
 date: 2025-07-15
 ---
-
-### Table of Contents
- - [Problem Overview](#problem-overview)
- - [CookBook](#cookbook)
- - [sim2Real](#sim2real)
- - [Rapid Motor Adaptation](#rapid-motor-adaptation)
- - [Citations](#citations)
-
 In recent years the building of robotics and parrallelization have made improvementes in parrallel computations and deep learning have opened up tasks that were once considered impossible. In this article will go through the process of training the go2 robot to walk in the world on unkown surfaces.
 
 # Problem Overview
@@ -46,10 +38,8 @@ $$
 This term was introduced to penalize the robot for unwanted movement along the z-axis (vertical direction).
 
 $$
-R_{\text{lin\_vel\_z}} = -v_{z}^2
+R_{\text{lin\_vel\_z}} = v_{z}^2
 $$
-
-Note: The penalty should be negative, as we want to subtract from the total reward when there is vertical velocity. The original equation was missing the negative sign.
 
 ## vertical height penalty 
 This penalty was introduced to prevent the robot from crawling during early stages of training as this prevents us from finding the desired behaviors of the model.
