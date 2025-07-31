@@ -14,6 +14,7 @@
       const { Carta, defaultExtensions } = await import('carta-md');
       const { math } = await import('@cartamd/plugin-math');
       const { code } = await import('@cartamd/plugin-code');
+      const { anchor } = await import('@cartamd/plugin-anchor');
       
       // Create new instance
       carta = new Carta({

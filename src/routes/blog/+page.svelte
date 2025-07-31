@@ -51,7 +51,8 @@
 									extensions={[
 										...defaultExtensions(),
 										math(),
-										code({ theme: 'github-dark' })
+										code({ theme: 'github-dark' }),
+										anchor()
 									]}
 								/>
 							{:else}
