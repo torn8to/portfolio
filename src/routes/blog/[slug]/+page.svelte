@@ -4,6 +4,7 @@
   	import { math } from '@cartamd/plugin-math';
   	import { code } from '@cartamd/plugin-code';
 	import adcFastMd from '../../../content/blog/adc-fast.md?raw';
+	import lidarOdometryMd from '../../../content/blog/lidar-odometry.md?raw';
 	import samplePostMd from '../../../content/blog/sample-post.md?raw';
 	import secondPostMd from '../../../content/blog/second-post.md?raw';
 	
@@ -221,6 +222,9 @@
 				case 'second-post':
 					fullMarkdown = secondPostMd;
 					break;
+        case 'lidar-odometry':
+          fullMarkdown = lidarOdometryMd;
+          break;
 				default:
 					fullMarkdown = article.description;
 			}
