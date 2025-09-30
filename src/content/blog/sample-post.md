@@ -72,7 +72,8 @@ Training with these parameters will hurt algorithims ability to converge as it h
 The previous policy did not give us the perofmance that i wanted, so i sourced an idea from research that improved adaptation of policy's to different environmets. This adds a module on top of the existing Module that we use to generate the robot walking movements. This takes in the previous observations at t-1 to t-51 to generate an output that is plugged into the observations of the walking policy
 
 ## Real World Demo
-![Video](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/rl_locomotion/locomotion_real.mp4?raw=true)
+@[youtube](https://youtu.be/xmJhrCm5OaE)
+
 
 ## Citations
 **(2021) Ashish Kumar**  RMA Rapid Motor Adaptation for Legged Robots

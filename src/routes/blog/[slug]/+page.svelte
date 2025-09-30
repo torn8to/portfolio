@@ -3,6 +3,8 @@
 	import { Carta, Markdown } from 'carta-md';
   	import { math } from '@cartamd/plugin-math';
   	import { code } from '@cartamd/plugin-code';
+	import { video } from 'carta-plugin-video';
+	//import '@cartamd/plugin-code/defaults.css';
 	import adcFastMd from '../../../content/blog/adc-fast.md?raw';
 	import lidarOdometryMd from '../../../content/blog/lidar-odometry.md?raw';
 	import samplePostMd from '../../../content/blog/sample-post.md?raw';
@@ -22,7 +24,8 @@
 		sanitizer: false,
 		extensions: [
 			math(),
-			code({ theme: 'github-dark' })
+			code({ theme: 'github-dark'}),
+			video()
 		],
 		options: {
 			// Enable anchor links for headers
@@ -222,9 +225,9 @@
 				case 'second-post':
 					fullMarkdown = secondPostMd;
 					break;
-        case 'lidar-odometry':
-          fullMarkdown = lidarOdometryMd;
-          break;
+       		    case 'lidar-odometry':
+          			fullMarkdown = lidarOdometryMd;
+					break;
 				default:
 					fullMarkdown = article.description;
 			}
@@ -272,6 +275,7 @@
 <svelte:head>
 	<title>{article?.title || 'Blog Post'} — Nathan Rogers</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cartamd/plugin-code@4.2.0/dist/themes/github-dark.css" />
 </svelte:head>
 
 <div class="article-container">
