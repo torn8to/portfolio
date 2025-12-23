@@ -3,6 +3,9 @@ title: GPU SparseVoxel HAshmap
 description: Building and developing a lidar odometry pipeline
 tags: Point Cloud Processing, C++, Thrust, Cuda
 date: 2025-09-15
+github: https://github.com/torn8to/pcl_lib/odom_ws/src/odom
+owner: torn8to
+repo: pcl_lib
 ---
 
 # introduction
@@ -10,23 +13,33 @@ To open up the ability of online lidar slam i need to be able to run the icp alg
 
 # hardware 
 Lenovo Legion 5 16" with a 3060 laptop card and a 16 core amd 6800h as processor.
-CPU: AMD Ryzen 9 6800H
-CORES: 16
-THREADS: 32
-RAM: 16GB DDR4
-GPU: NVIDIA GeForce RTX 3060 Laptop GPU
-GPU RAM: 6GB
-Operating System: Ubuntu 24.04.5 LTS
+ - CPU: AMD Ryzen 9 6800H
+ - CORES: 16
+ - THREADS: 32
+ - RAM: 16GB DDR4
+ - GPU: NVIDIA GeForce RTX 3060 Laptop GPU
+ - GPU RAM: 6GB
+ - Operating System: Ubuntu 24.04.5 LTS
 
 
 # Challenges
-There are a few challenges that i need to address to make this work. I need to use a Hashmap on the gpu to store the voxels. The libraries on the cpu Eigen and Sophus do have support for cuda a few of the functions i need to use Constructor and do can not be directly translated to the gpu. More specifically the exponential map function is a static function that calls a constructor. Eigen the default implementations have alignment checks that are not compatible with the gpu luckily there is a workaround for this below. this allows me to copy my data from the cpu to with it being compatible with the gpu Sophus supports these eigen types which allows me to do point transforms easily.
+There are a few challenges that i need to address to make this work. I need to use a Hashmap on the gpu to store the voxels. The libraries on the cpu Eigen and Sophus do have support for cuda a few of the functions i need to use Constructor and do can not be directly translated to the gpu. More specifically the exponential map function is a static function that calls a constructor. Eigen the default implementations have alignment checks that are not compatible with the gpu luckily there is a workaround for this below. this allows me to copy my data from the cpu to with it being compatible with the gpu Sophus supports these eigen types which allows me to do point transforms easily on the gpu.  This can be seen in the code below. with the Eigen::DontAlign flag. 
+
+The way the program is structured is that we allocate the data to the gpu and then proceed with the process but for the decomposition of the hessian matrix we copy our summed linear system back to the cpu and perform linear decomposition and then check the residual to see if we need to run more iterations. This then recalls the gpu kernel to run again with a new transform passed in.  There is an issue with the linear decomposition cholesky decomposition can not be directly copied from the gpu to the cpu as when writing the linear decomposition i went with a row major layout when writing the formulation of the hessian matrix. This requires new types to be defined for the linear system to be copied from cpu and gpu. 
+
 
 ```cpp
-    Eigen::Vector3dDNA = Eigen::Matrix<double, 3, 1, Eigen::DontAlign>
+    // the original implementation is 
+    using Eigen::Matrix6d = Eigen::Matrix<double, 6, 6>;
+    using Eigen::Vector6d = Eigen::Matrix<double, 6, 1>;
+    using Eigen::Vector3d = Eigen::Matrix<double, 3, 1>;
 
+    // the new implementation is 
+    using Eigen::Matrix6dDNA = Eigen::Matrix<double, 6, 6, Eigen::RowMajor, Eigen::DontAlign>;
+    using Eigen::Vector6dDNA = Eigen::Matrix<double, 6, 1, Eigen::DontAlign>;
+    using Eigen::Vector3dDNA = Eigen::Matrix<double, 3, 1, Eigen::DontAlign>;
 ```
-The issue with sophus comes with the deriving the jacobian as we need to get the exponential map of the source which is a static function that calls the constructor of the SO3 class.  This requires us to implement our own exponential map function.
+The issue with sophus comes with the deriving the jacobian as we need to get the exponential map of the source which is a static function that calls the constructor of the SO3 class. This is not supported with cuda.  We 
 
 The next issue is the Hashmap implementation on the gpu as it is not directly supported by the cuda toolkit. In my case i will be using the library stdgpu whihch implements a hashmap on the gpu. This is a template library that allows for the use of a hashmap on the gpu.  
 
@@ -50,14 +63,14 @@ For each iteration on the odometry we will be running odometry using the a Lidar
 
 The only application open will be a fresh terminal executing the odometry algorithm. with no other applications open to prevent any other processes from using the gpu except for the default driver processes.  The benchmark will be run on 10513 frames of the kitti360 dataset sequence 00. The times of processing each scan of the odometry algorithm will be saved to a file and then analyzed using a box and whisker plot and a histogram to show the distribution of the timing.
 # results
-![results](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/gpu_icp/box%20and%20whisker%20plot%20and%20histogram.png?raw=true)
+![results](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/gpu_icp/box%20and%20whisker%20plot%20and%20histogram.png?raw=true)
 
 The Box and whisker plot shows the distribution of the timings and the outliers of the timings of the odometry algorithm. With circles representing the outliers in timing the data.  The dotted line in the box and whisker plot represents the 10 hz threshold line for processing the odometry algorithm for a single 10 hz lidar scan. While most of the scans are below the threshold of 10 hz for all implementations the gpu implementation is able to process the scans at 10hz we have outliers that take longer than 10hz and this long tail distribution becomes a problem in realtime  setups as scans that that take longer than 10hz will cause skipped frames.  This can cause the odometry algorithm to fail to process the scan and cause the odometry to be unstable and fail. This happens with the 8 core cpu implementation but not with the 8 core implementation when used in real time.  The gpu implementation is able to solve this with only a few outliers that exist over 10 hz but it does with only 10 runs being over 10 hz threshold. This succeds in preventing skipped frames and allows the odometry algorithm to run at 10 hz. 
 
 The histogram shows a different version of the tailend distribution issue which is that a miniscule amount of readings have a processing time to break the algorithm and prevent it from running at 10 hz. The gpu version has a miniscule amount of readings that take longer than 10 hz but the 8 core cpu version has a miniscule amount of readings that take longer than 10 hz. This opens up overhead on to run other programs and algorithms on the cpu that may be needed for the odometry algorithm to run at 10 hz. 
 
-![results](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/gpu_icp/zoomed%20histogram.png?raw=true)
-An interesting side note is that in low iteration icp the cpu based method is actually faster than the gpu based method. This is because of the overhead of copying the data to the gpu. but each iteration of the icp algorithm is faster on the gpu on average by 3.76x faster for each icp iteration. This opens up overhead for global optimization to take place along side the odometry algorithm. enabling the definition of a more accuarate gloabl map.   
+![results](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/gpu_icp/zoomed%20histogram.png?raw=true)
+An interesting side note is that in low iteration icp the cpu based method is actually faster than the gpu based method. This is because of the overhead of copying the data to the gpu. but each iteration of the icp algorithm is faster on the gpu on average by 3.76x faster for each icp iteration. This opens up overhead for global optimization to take place along side the odometry algorithm. enabling the definition of a more accuarate global map.   
 
 # citations
 Journal Article (SLAMCast):

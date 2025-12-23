@@ -2,7 +2,10 @@
 title: Lidar Odometry Pipeline
 description: Building and developing a lidar odometry pipeline
 tags: Point Cloud Processing, ROS2, C++
-date: 2025-07-15
+date: 2025-09-30
+github: https://github.com/torn8to/lidar-odometry
+owner: torn8to
+repo: pcl_lib
 ---
 
 # Problem Overview  
@@ -48,8 +51,8 @@ Below is a plot of the odometry trajectories. v. the ground truth on the kitti 3
 The figure above that we can see is a un colored reference where ground truth is in the dotted line.  We see a consistent under turning of the lidar odometry model and this error propogates even more on the straight aways. a Visual inspection in rviz notes that we run into an issue alignment struggles to match on tight turns especially when it reaches the a higher amount of iterations for icp closure.
 
 ###  translation and rotation error
-| Metric | Absolute translation Error (M) | Relative orientation Error (rad) |
-|:--------|---------------:|----------------------:|
+| Metric | Absolute translation Error (M) | reative translation error (rad) |
+|:--------|---------------:|------------:|
 | max     | 270.917181     | 0.644514 |
 | mean    | 104.885192     | 0.082769 |
 | median  | 97.903733      | 0.033575 |
@@ -78,8 +81,8 @@ In the rotation error plots we see a consistent low error when it comes to the s
 # Full Kitti360 Dataset Quantitative
 
 
-| Kitti360 run | Absolute translation Error (M) | Relative orientation Error (rad) |
-|:--------|---------------:|----------------------:|-------:
+| Kitti360 run | ATE (m) | ROE (radians) |
+|:--------|---------------:|------------:|
 | 0000    | 270.917181     | 0.644514 |
 | 0002    | NA             | NA       |
 | 0003    | 270.917181     | 0.644514 |
@@ -93,7 +96,7 @@ In the rotation error plots we see a consistent low error when it comes to the s
 
 *The data would not run properly as it was missing lidar points redownloading the dataset did not fix the missing point issue.
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/ate_map.png?raw=true)
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/ate_map.png?raw=true)  
 
 
 ![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/ate_raw.png?raw=true)
@@ -108,11 +111,6 @@ In translation errror we see that on the overall their is a large progressive gr
 ![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/plots_raw.png?raw=true)
 
 In the rotation error plots we see a consistent low error when it comes to the straight aways with a few areas that show rotation error.  This heavily apparent when the car does 180s and takes turns. This is a result of error in the motion model and and tight turn causes the point deskewing to be off. An initial guess to be off drastically causing more icp iterations or the convergence criteria can not be met. whihc prevents other clouds from being processed.
-
-# Full Kitti360 Dataset Quantitative
-
-
-
 
 
 # conclusion

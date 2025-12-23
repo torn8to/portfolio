@@ -27,6 +27,16 @@ const posts = [
 		url: "quadraped-training.md",
 		slug: 'quadraped-training',
 		markdownPath: 'src/content/blog/quadraped-training.md'
+	},
+	{
+		id: 'slam-challenge',
+		title: 'Slam Challenge',
+		tags: ['Point Cloud Processing', 'ROS2', 'C++'],
+		description: 'A scan to model lidar odometry algorithm \
+		using point to point icp using a voxel hashmap for efficient point lookup, A pipeline using motion models for deskewing points',
+		url: "slam-challenge.md",
+		slug: 'slam-challenge',
+		markdownPath: 'src/content/blog/slam-challenge.md'
 	}
 ];
 

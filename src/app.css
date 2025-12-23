@@ -1,5 +1,12 @@
 @import "tailwindcss/preflight";
+@import "katex/dist/katex.min.css";
+
+@theme {
+  --font-fira-code: "Fira Code", monospace;
+}
+
 @tailwind utilities;
+@plugin "@tailwindcss/typography";
 
 @layer base {
   @font-face {
@@ -8,14 +15,20 @@
     src: url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
   }
 
-  html, body {
+  html,
+  body {
     font-family: 'Fira Code', monospace;
     height: 100%;
     color: white;
     background-color: #0a0908;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: white;
   }
 
@@ -48,7 +61,7 @@
     background-color: transparent;
     border-radius: 1px;
   }
-  
+
   /* Force logo size */
   img[src="/logo.svg"] {
     width: 30px !important;

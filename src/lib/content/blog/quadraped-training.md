@@ -2,7 +2,10 @@
 title: Teaching a quadruped to walk using reinforcement learning
 description: This post is a walkthrough making and teaching a robot to walk 
 tags: markdown, demo, svelte
-date: 2025-07-15
+date: 2025-09-15
+github: https://github.com/torn8to/go2-rl
+owner: torn8to
+repo: go2-rl
 ---
 In recent years the building of robotics and parrallelization have made improvementes in parrallel computations and deep learning have opened up tasks that were once considered impossible. In this article will go through the process of training the go2 robot to walk in the world on unkown surfaces.
 
