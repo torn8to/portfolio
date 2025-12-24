@@ -137,16 +137,3 @@ N. Chebrolu, T. Läbe, O. Vysotska, J. Behley, and C. Stachniss, “Adaptive rob
 I. Vizzo, T. Guadagnino, B. Mersch, L. Wiesmann, J. Behley, and C. Stachniss, “KISS-ICP: In defense of point-to-point ICP – Simple, accurate, and robust registration if done the right way,” IEEE Robotics and Automation Letters, vol. 8, no. 2, pp. 1029–1036, Feb. 2023, doi: 10.1109/LRA.2023.3236571.
 
 H. Lim, D. Kim, B. Kim, and H. Myung, “AdaLIO: Robust adaptive LiDAR-inertial odometry in degenerate indoor environments,” arXiv preprint arXiv:2304.12577, 2023.
-
-
-
-# conclusion
-I've implemented a point to point lidar odometry algorithims that can efficiently run in realtime on my laptop. It can perform odometry in realtime with little parameter finetuning. Their are still many ways to improve the algorithm as we briefly touched on aparts where the odometry algorithim struggles but this could be helpful such as opening up reliable performance for enabling multiple sensor configurations to work reliably.  In implementation of the algorithims on the gpu is ripe for massive speed due to the highly parallel nature of gpus can work well with the nature of hashmaps and the higly non sequential nature of many of the procedures enables a performance boost in implemnting the datastructures and algorithims on the gpu.
-Implementing loop closure detection with pose graph optimization will provid drastic improvements to accuracy and reduce the accumulation of pose error that comes from persistent operation.
-
-# Citations
-N. Chebrolu, T. Läbe, O. Vysotska, J. Behley, and C. Stachniss, “Adaptive robust kernels for non-linear least squares problems,” arXiv preprint arXiv:2004.14938, 2020.
-
-I. Vizzo, T. Guadagnino, B. Mersch, L. Wiesmann, J. Behley, and C. Stachniss, “KISS-ICP: In defense of point-to-point ICP – Simple, accurate, and robust registration if done the right way,” IEEE Robotics and Automation Letters, vol. 8, no. 2, pp. 1029–1036, Feb. 2023, doi: 10.1109/LRA.2023.3236571.
-
-H. Lim, D. Kim, B. Kim, and H. Myung, “AdaLIO: Robust adaptive LiDAR-inertial odometry in degenerate indoor environments,” arXiv preprint arXiv:2304.12577, 2023.
