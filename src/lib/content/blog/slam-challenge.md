@@ -8,15 +8,6 @@ owner: torn8to
 repo: pcl_lib
 ---
 # Slam Challenge
-## Architectiur
-```tikz
-\begin{tikzpicture}
-    \node (Lidar Odometry Frontend) [input] {Input};
-    \node (output) [output, below of=input] {Output};
-    \draw [arrow] (input) -- (output);
-\end{tikzpicture}
-```
 
 
-# 
-
+## Rolling Shutter

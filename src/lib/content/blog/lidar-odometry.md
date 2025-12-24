@@ -3,10 +3,13 @@ title: Lidar Odometry Pipeline
 description: Building and developing a lidar odometry pipeline
 tags: Point Cloud Processing, ROS2, C++
 date: 2025-09-30
-github: https://github.com/torn8to/lidar-odometry
+github: https://github.com/torn8to/pcl_lib
 owner: torn8to
 repo: pcl_lib
 ---
+
+# Video
+<iframe width="560" height="315" src="https://www.youtube.com/embed/_HwBUZM7TRw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>   
 
 # Problem Overview  
 Lidar odometry is the process of using either 2d or 3d lidar data to use as a way to update track the movement of a robot through space.  The back bone of this is done via iterative closest point algoirithim (icp) or similar algorithims that match and align structural data to develop and build.  To gain a better understanding im going to reimplement the kiss icp pipeline.
@@ -18,9 +21,11 @@ An icp as a simple algorithm at its simples is an alignment of center of mass ca
 To libnearize the problem we need to formualte the jacobian to linearize the system. our input to the jacobian is tx, ty tz rx ry rz which is the tangent of the se3 space relative to the source coorespondence and our output is in the form of difference in source and target coorespondences colloquially called the residual .  This output is dependent upon the dimension of the space but  for ours it is 3 dimensional space as we areddoign icp. the first part of the hjacobian is an idenity matrix as the tx ty tz relative to the residual evaluates to a contant as is just (x y z) respectively.  The second part of the jacobian is more complicated as it is. we need to parital derivatives rx ry rz realtive to x y z. luckily for us we in lie algebra we have a way to get the hat operator which allows us to -1 * hat of the source get us the derivative of the rotation relative to the the source cloud. This completes our jacobian.
 
 ### kernel scale
-Kernel scale is a way to build a an adapable uncertainty meausrement into weighting outliers in weight a point when building a linear system based on kernel scale in our case a scalar value that weight the effect of magnitude of the residual making points with higher deviation having less weight and point with less magnitude worh more and the kernel scale is a way of controlling outlier weighting for the transform. Using a loss function with the kernel scale allows us to modify value provided to kernel scale based on the previous input. I just copied the loss function from kiss-icp more can be read about it in . 
+Kernel scale is a way to build a an adapable uncertainty meausrement into weighting outliers in weight a point when building a linear system based on kernel scale in our case a scalar value that weight the effect of magnitude of the residual making points with higher deviation having less weight and point with less magnitude worh more and the kernel scale is a way of controlling outlier weighting for the transform. Using a loss function with the kernel scale allows us to modify value provided to kernel scale based on the previous input. I just copied the loss function from kiss-icp more can be read about it in. 
+
+
 $$
-     w  = \frac{ks}{ks + P_{\text{residualNorm}}}
+    w  = \frac{ks}{ks + P_{\text{residualNorm}}}
 $$
 
 ### sparse voxel hashmap 
@@ -30,10 +35,19 @@ The datastructure i use for efficient lookup is the A sparse voxel hasmap where 
 Icp is not the only part of the odometry pipeline they are a few components that overlay the icp algorithim that allow us increase the speed and accuracy of processing a measurement. This comes in the form of motion models, point deskewing and point sampling strategies.  
 
 ## motion models 
-In Lidar odometry because of the delay between readings a lot can happen as mobile robotgif of the hand held construction site with motion model.  The motion model we use is from kiss-icp their constant motion model which assumes that the motion between each lidar pose is similar as in most cases when existing on the period of a lidar scan motion is similar. This model has issues when used chassis with a chassis but when used on less stable motion platforms. Such as a handheld platform. 
+In Lidar odometry because of the delay between readings a lot can happen as mobile robotgif of the hand held construction site with motion model.  The motion model we use is from kiss-icp their constant motion model which assumes that the motion between each lidar pose is similar as in most cases when existing on the period of a lidar scan motion is similar. This model has issues when used chassis with a chassis but when used on less stable motion platforms, such as a handheld platform. 
 
-![Using a motion model with a hand held data intake platform](
-    https://github.com/torn8to/odom_ws/blob/master/media/output.gif?raw)
+$$
+    \Delta EM_{t+1} = P_{t-1}^{-1} * P_{t}
+$$
+$$
+    EP_{t+1} = \Delta EM_{t+1} * P_{t}
+$$
+
+This fails when the motion between scans differs to great causing the odometry to fail. This can be corrected by using promper imu integration either through a preintegration or a kalman filter. This will not be covered in this writing.
+![Using a motion model with a hand held data intake platform](https://github.com/torn8to/odom_ws/blob/master/media/lidar_odom.gif)
+if gif is not loading try this [link](https://github.com/torn8to/odom_ws/blob/master/media/lidar_odom.gif)
+
 
 To make up for this we use imu preintegration which is allows us to take preferably processed imu measurements and build higher frequency odometry to inform lidar odometry. thsi gets plugged in simiilarly to the aforementioned kiss icp constant motion model. The imu output is fused for point deskewing and as an initial guess for point deskewing.
 
@@ -62,19 +76,19 @@ The figure above that we can see is a un colored reference where ground truth is
 | std     | 64.308978      | 0.102848 |
 
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/ate_map.png?raw=true)
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/odometry/ate_map.png?raw=true)
 
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/ate_raw.png?raw=true)
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/odometry/ate_raw.png?raw=true)
 
 
 In translation errror we see that on the overall their is a large progressive growth in error over time that while errors occur on some longer straight aways and do recover the overall trend is as the more distance travelled we se greater error.  While the maxes are earlier on the and their is recover the consitent accumulation error pushes it away from the ground truth. 
 
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/plots_map.png?raw=true)
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/odometry/plots_map.png?raw=true)
 
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/plots_raw.png?raw=true)
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/odometry/plots_raw.png?raw=true)
 
 In the rotation error plots we see a consistent low error when it comes to the straight aways with a few areas that show rotation error.  This heavily apparent when the car does 180s and takes turns. This is a result of error in the motion model and and tight turn causes the point deskewing to be off. An initial guess to be off drastically causing more icp iterations or the convergence criteria can not be met. whihc prevents other clouds from being processed.
 
@@ -96,19 +110,19 @@ In the rotation error plots we see a consistent low error when it comes to the s
 
 *The data would not run properly as it was missing lidar points redownloading the dataset did not fix the missing point issue.
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/ate_map.png?raw=true)  
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/odometry/ate_map.png?raw=true)  
 
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/ate_raw.png?raw=true)
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/odometry/ate_raw.png?raw=true)
 
 
 In translation errror we see that on the overall their is a large progressive growth in error over time that while errors occur on some longer straight aways and do recover the overall trend is as the more distance travelled we se greater error.  While the maxes are earlier on the and their is recover the consitent accumulation error pushes it away from the ground truth. 
 
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/plots_map.png?raw=true)
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/odometry/plots_map.png?raw=true)
 
 
-![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/content/blog/iamges/odometry/plots_raw.png?raw=true)
+![a plot of trajectory of the odometry algorithim on kitti 360](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/odometry/plots_raw.png?raw=true)
 
 In the rotation error plots we see a consistent low error when it comes to the straight aways with a few areas that show rotation error.  This heavily apparent when the car does 180s and takes turns. This is a result of error in the motion model and and tight turn causes the point deskewing to be off. An initial guess to be off drastically causing more icp iterations or the convergence criteria can not be met. whihc prevents other clouds from being processed.
 

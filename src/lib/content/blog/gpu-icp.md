@@ -3,15 +3,15 @@ title: GPU SparseVoxel HAshmap
 description: Building and developing a lidar odometry pipeline
 tags: Point Cloud Processing, C++, Thrust, Cuda
 date: 2025-09-15
-github: https://github.com/torn8to/pcl_lib/odom_ws/src/odom
+github: https://github.com/torn8to/pcl_lib/src/cuda
 owner: torn8to
 repo: pcl_lib
 ---
 
-# introduction
+# Introduction
 To open up the ability of online lidar slam i need to be able to run the icp algorithim in tandom with the odometry algorithim. This will allow for the odometry algorithim to run at a higher rate than the cpu on my computer will allow maintaining a constant frame rate. as such i need to be able to run the icp algorithim at a higher rate than the cpu can handle. The option i have is to use the nvidia gpu integrated into my laptop.
 
-# hardware 
+# Hardware 
 Lenovo Legion 5 16" with a 3060 laptop card and a 16 core amd 6800h as processor.
  - CPU: AMD Ryzen 9 6800H
  - CORES: 16
@@ -19,14 +19,18 @@ Lenovo Legion 5 16" with a 3060 laptop card and a 16 core amd 6800h as processor
  - RAM: 16GB DDR4
  - GPU: NVIDIA GeForce RTX 3060 Laptop GPU
  - GPU RAM: 6GB
- - Operating System: Ubuntu 24.04.5 LTS
+ - OS: Ubuntu 24.04.5 LTS
 
 
-# Challenges
+# Adapting the code
 There are a few challenges that i need to address to make this work. I need to use a Hashmap on the gpu to store the voxels. The libraries on the cpu Eigen and Sophus do have support for cuda a few of the functions i need to use Constructor and do can not be directly translated to the gpu. More specifically the exponential map function is a static function that calls a constructor. Eigen the default implementations have alignment checks that are not compatible with the gpu luckily there is a workaround for this below. this allows me to copy my data from the cpu to with it being compatible with the gpu Sophus supports these eigen types which allows me to do point transforms easily on the gpu.  This can be seen in the code below. with the Eigen::DontAlign flag. 
 
-The way the program is structured is that we allocate the data to the gpu and then proceed with the process but for the decomposition of the hessian matrix we copy our summed linear system back to the cpu and perform linear decomposition and then check the residual to see if we need to run more iterations. This then recalls the gpu kernel to run again with a new transform passed in.  There is an issue with the linear decomposition cholesky decomposition can not be directly copied from the gpu to the cpu as when writing the linear decomposition i went with a row major layout when writing the formulation of the hessian matrix. This requires new types to be defined for the linear system to be copied from cpu and gpu. 
+ - Eigen types not natively compatible with gpu
+ - No HashMap implementation in cuda toolkit
+ - Some Sophus functions not natively compatible with cuda
+ - need to ensure no race conditions when interacting with the Sparse Voxel HashMap (insertion and point addition)
 
+The way the program is structured is that we allocate the data to the gpu and then proceed with the process but for the decomposition of the hessian matrix we copy our summed linear system back to the cpu and perform linear decomposition and then check the residual to see if we need to run more iterations. This then recalls the gpu kernel to run again with a new transform passed in.  There is an issue with the linear decomposition cholesky decomposition can not be directly copied from the gpu to the cpu as when writing the linear decomposition i went with a row major layout when writing the formulation of the hessian matrix. This requires new types to be defined for the linear system to be copied from cpu and gpu. 
 
 ```cpp
     // the original implementation is 
@@ -39,7 +43,7 @@ The way the program is structured is that we allocate the data to the gpu and th
     using Eigen::Vector6dDNA = Eigen::Matrix<double, 6, 1, Eigen::DontAlign>;
     using Eigen::Vector3dDNA = Eigen::Matrix<double, 3, 1, Eigen::DontAlign>;
 ```
-The issue with sophus comes with the deriving the jacobian as we need to get the exponential map of the source which is a static function that calls the constructor of the SO3 class. This is not supported with cuda.  We 
+The issue with sophus comes with the deriving the jacobian as we need to get the exponential map of the source which is a static function that calls the constructor of the SO3 class. This is not supported with cuda.  We can get around this by using the constructor of the SO3 class and then using the exponential map function to get the exponential map of the source. 
 
 The next issue is the Hashmap implementation on the gpu as it is not directly supported by the cuda toolkit. In my case i will be using the library stdgpu whihch implements a hashmap on the gpu. This is a template library that allows for the use of a hashmap on the gpu.  
 
@@ -61,7 +65,8 @@ For validating the accuracy of each method we will use compare to odometry outpu
 
 For each iteration on the odometry we will be running odometry using the a Lidar odometry with no imu data. This provides a better snapshot of the performance of the icp algorithm.  We will be timing the odometry algorithm in full including point sampling, motion deskewing, icp, as well as updating the sparse voxel hash map with the new points and removing the voxels outside of the local map radius. 
 
-The only application open will be a fresh terminal executing the odometry algorithm. with no other applications open to prevent any other processes from using the gpu except for the default driver processes.  The benchmark will be run on 10513 frames of the kitti360 dataset sequence 00. The times of processing each scan of the odometry algorithm will be saved to a file and then analyzed using a box and whisker plot and a histogram to show the distribution of the timing.
+The only application open will be a fresh terminal executing the odometry algorithm. with no other applications open to prevent any other processes from using the gpu except for the default driver processes.  The benchmark will be run on 10513 frames of the kitti360 dataset sequence 00. The times of processing each scan of the odometry algorithm will be saved to a file and then analyzed using a box and whisker plot and a histogram to show the distribution of the timing.  We will be ignoring imu data to show the performance of the icp algorithm in isolation to the imu data.
+
 # results
 ![results](https://github.com/torn8to/portfolio/blob/master/src/lib/content/blog/iamges/gpu_icp/box%20and%20whisker%20plot%20and%20histogram.png?raw=true)
 

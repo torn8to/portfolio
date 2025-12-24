@@ -1,65 +1,152 @@
 <script>
-	import { modalOpened } from '$lib/store';
-	let isOpen = false;
-	let closing = false;
+  import { modalOpened } from "$lib/store";
+  let isOpen = false;
+  let closing = false;
 
-	modalOpened.subscribe((value) => {
-		closing = false;
-		isOpen = value;
-	});
+  modalOpened.subscribe((value) => {
+    closing = false;
+    isOpen = value;
+  });
 
-	const close = () => {
-		closing = true;
-		setTimeout(() => {
-			modalOpened.set(false);
-		}, 300);
-	};
+  const close = () => {
+    closing = true;
+    setTimeout(() => {
+      modalOpened.set(false);
+    }, 300);
+  };
 </script>
 
 {#if isOpen}
-	<div class={`fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-[2000] flex justify-center items-center ${closing ? 'closing' : ''}`}>
-		<div 
-			class="absolute w-full h-full bg-black/50 backdrop-blur-md animate-[slidein_0.3s_ease-in-out] closing:animate-[slideOut_0.3s_ease-in-out]" 
-			on:click={close} 
-			role="button" 
-			tabindex="0" 
-			on:keypress={close}
-			aria-label="Close modal"
-		></div>
-		<div class="z-10 max-w-[70vw] rounded-md overflow-hidden p-8 md:p-12 rounded-3xl bg-gradient-to-br from-white/15 to-transparent backdrop-blur-xl shadow-lg shadow-black/10 animate-[openModalAnimation_0.3s_ease-in-out] closing:animate-[closeModalAnimation_0.3s_ease-in-out] md:min-w-[400px]">
-			<div class="max-h-[50vh] overflow-hidden">
-				<slot name="content"></slot>
-			</div>
-		</div>
-	</div>
+  <div class={`modal ${closing && "closing"}`}>
+    <div
+      class="backdrop"
+      on:click={close}
+      role="button"
+      tabindex="0"
+      on:keypress={close}
+    />
+    <div class="content-wrapper">
+      <div class="content">
+        <slot name="content" />
+      </div>
+      <a
+        href="mailto:nathanrogers314@gmail.com"
+        target="_blank"
+        rel="noreferrer"
+        class="w-fit !bg-orange-500 !text-center !text-white !padding-top-5px"
+      >
+        <div
+          class="button !padding-top-5px !bg-orange-500 !w-fit !text-center !text-white"
+          on:click={close}
+          on:keypress={close}
+          role="button"
+          tabindex="0"
+          on:keypress={close}
+        >
+          Send Email
+        </div>
+      </a>
+    </div>
+  </div>
 {/if}
 
 <style>
-	@keyframes slidein {
-		from { opacity: 0; }
-		to { opacity: 1; }
-	}
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-	@keyframes slideOut {
-		from { opacity: 1; }
-		to { opacity: 0; }
-	}
+  @keyframes slidein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
-	@keyframes openModalAnimation {
-		from { opacity: 0; transform: scale(0); }
-		to { opacity: 1; transform: scale(1); }
-	}
+  .backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    animation: slidein 0.3s ease-in-out;
+  }
 
-	@keyframes closeModalAnimation {
-		from { opacity: 1; transform: scale(1); }
-		to { opacity: 0; transform: scale(0); }
-	}
+  @keyframes openModalAnimation {
+    from {
+      opacity: 0;
+      transform: scale(0);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
-	.closing .backdrop {
-		animation: slideOut 0.3s ease-in-out;
-	}
-	
-	.closing .content-wrapper {
-		animation: closeModalAnimation 0.3s ease-in-out;
-	}
-</style> 
+  .content-wrapper {
+    z-index: 10;
+    max-width: 70vw;
+    border-radius: 0.3rem;
+    overflow: hidden;
+    padding: 30px;
+    border-radius: 25px;
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.15), transparent);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    box-shadow:
+      2px 4px 6px rgba(0, 0, 0, 0.1),
+      inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+    animation: openModalAnimation 0.3s ease-in-out;
+  }
+
+  @keyframes slideOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes closeModalAnimation {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0);
+    }
+  }
+
+  .closing .backdrop {
+    animation: slideOut 0.3s ease-in-out;
+  }
+  .closing .content-wrapper {
+    animation: closeModalAnimation 0.3s ease-in-out;
+  }
+
+  .content {
+    max-height: 50vh;
+    overflow: hidden;
+  }
+
+  @media (min-width: 900px) {
+    .content-wrapper {
+      padding: 50px;
+      min-width: 400px;
+    }
+  }
+</style>
