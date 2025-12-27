@@ -10,9 +10,10 @@
   <main>
     <h1>About</h1>
     <p>
-      I'm a Robotics/Hardware Engineer with a strong background in sensor
-      processing and computer vision. I have experience building lidar slam
-      systems,
+      Robotics/Hardware Engineer with Expirence and a curiosity for building efficient processes for robots. I have experience building Lidar Slam Systemsa
+
+
+      Junior DevOps Engineer seeking to leverage hands-on experience in cloud infrastructure, automation, and CI/CD pipelines to deliver efficient solutions. Proven success in improving system performance and reducing operational costs through automation and containerization. Looking to apply my skills in a fast-paced, results-driven environment
     </p>
     <h2>Skills</h2>
     {#each Object.entries(skills) as [section, technologies]}

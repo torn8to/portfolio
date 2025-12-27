@@ -1,6 +1,6 @@
 const skills = {
 	"Programming Languages": ["C/C++", "Python", "CUDA"],
-	Libraries: ["Eigen", "Sophus", "PCL", "OpenCV", "NumPy", "PyTorch"],
+	Libraries: ["Eigen", "PCL", "OpenCV", "NumPy", "PyTorch", "Cutlass-dsl"],
 	Robotics: ["ROS/ROS2", "RVIZ", "Gazebo", "Kicad"],
 	AI: ["Deep Learning", "Knowledge Distillation"],
 	databases: ["SQLite3", "PostgreSQL"],
