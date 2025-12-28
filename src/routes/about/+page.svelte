@@ -10,7 +10,7 @@
   <main>
     <h1>About</h1>
     <p>
-      Robotics/Hardware Engineer with Expirence and a curiosity for building efficient processes for robots. I have experience building Lidar Slam Systemsa
+      Robotics/Hardware Engineer seeking to leverage hands-on experience developing robots and robot autonomy. Building 
 
 
       Junior DevOps Engineer seeking to leverage hands-on experience in cloud infrastructure, automation, and CI/CD pipelines to deliver efficient solutions. Proven success in improving system performance and reducing operational costs through automation and containerization. Looking to apply my skills in a fast-paced, results-driven environment
