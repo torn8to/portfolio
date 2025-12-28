@@ -15,7 +15,7 @@
     <h1
       class="font-bold text-[36px] md:text-[48px] lg:text-[64px] mt-0 mb-[40px] text-white leading-[1.4]"
     >
-      Hi!✋ <br /> I'm Nathan Rogers a Robotics/Hardware engineer
+      Hi!✋ <br /> I'm Nathan Rogers a Robotics/Software Engineer
     </h1>
 
     <div class="flex justify-center items-center gap-10 mt-[40px]">
