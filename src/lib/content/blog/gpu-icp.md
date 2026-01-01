@@ -53,6 +53,7 @@ Some other differences in the implementation at well such as number of points in
 
 Their are parts that happen outside of the icp algorihm such as random sampling and motion deskewing that are run on the cpu for both implementations. point sampling happens on the cpu as the implemnting the hashmap sampling on the gpu does not provide the same randomness as the cpu implementation. The motion deskewing is kept on the cpu as the overhead of copying the data to the gpu is slower than running the multithreaded implementation on the cpu.
 
+
 # Methodology and Setup
 To compare the performance of the implementations on the gpu and cpu we will test two configurations of VoxelHashMap on the cpu altering the the number of threads used in the icp algorithm to 8 and 16 as well as a the gpu implementation using a block size of 4096.  The parameters such as voxel size and max points per voxel will be the same to match the cpu implementation.  
 

@@ -3,9 +3,9 @@ title: Lidar Odometry Pipeline
 description: Building and developing a lidar odometry pipeline
 tags: Point Cloud Processing, ROS2, C++
 date: 2025-09-30
-github: https://github.com/torn8to/pcl_lib
+github: https://github.com/torn8to/simple-lidar-odometry
 owner: torn8to
-repo: pcl_lib
+repo: simple-lidar-odometry
 ---
 
 # Video
@@ -54,7 +54,7 @@ To make up for this we use imu preintegration which is allows us to take prefera
 ## deskewing sensor reading
 Deskewing sensor readings happens due to the nature of multi dimensional lidar sensors collect data.  They spin at a constant rate and based on predicted motion pattern via the contant motion model. this can be done by normalizing the time stamps and converting the estimated change in pose converting it to the log of the pose and multiplying by the normalized timestamp().  we multiply the log by the normalized timestamp and convert to the exponential map to arrive at the compensated motion point. 
 
-# results and analysis
+## results and analysis
 The section below we will go over a graphical and numerical analysis of the point method.  The hardware this was run on was the amd ryzen 6800h running in balanced power mode with the cores averaging about the lidar odometry is running on 16 cores, with an nvidia 3060 laptop card with 6gb of vram.  The odometry algorithim was run in ros2 using the constant motion model.  Data was quantitatively analyzed using the evo toolkit by Michael Grupp.
 
 ## kitti360 dataset 
@@ -92,8 +92,7 @@ In translation errror we see that on the overall their is a large progressive gr
 
 In the rotation error plots we see a consistent low error when it comes to the straight aways with a few areas that show rotation error.  This heavily apparent when the car does 180s and takes turns. This is a result of error in the motion model and and tight turn causes the point deskewing to be off. An initial guess to be off drastically causing more icp iterations or the convergence criteria can not be met. whihc prevents other clouds from being processed.
 
-# Full Kitti360 Dataset Quantitative
-
+## Kitti360 Dataset Quantitative
 
 | Kitti360 run | ATE (m) | ROE (radians) |
 |:--------|---------------:|------------:|
